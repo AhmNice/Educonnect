@@ -39,6 +39,7 @@ import UserProfilePage from "./Pages/admin/UserProfile";
 import CoursesPage from "./Pages/admin/CoursesPage";
 import StudyGroupsPage from "./Pages/admin/StudyGroupPage";
 import ResourcesPage from "./Pages/admin/ResoursesPage";
+import UnderConstruction from "./components/UnderConstruction";
 
 function App() {
   const router = createBrowserRouter(
@@ -162,6 +163,14 @@ function App() {
           }
         />
         <Route
+          path="notifications"
+          element={
+            <ProtectedRoute requiredRole="student">
+              <UnderConstruction />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="resources"
           element={
             <ProtectedRoute requiredRole="student">
@@ -224,6 +233,22 @@ function App() {
           element={
             <ProtectedRoute requiredRole="admin">
               <ResourcesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/reports"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <UnderConstruction />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/analytics"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <UnderConstruction />
             </ProtectedRoute>
           }
         />

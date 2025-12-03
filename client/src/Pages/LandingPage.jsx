@@ -182,7 +182,10 @@ function LandingPage() {
                   )
                 )}
                 <div className="pt-4 border-t border-gray-200">
-                  <button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-medium">
+                  <button
+                    onClick={() => navigate("/login")}
+                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-medium"
+                  >
                     Get Started
                   </button>
                 </div>
