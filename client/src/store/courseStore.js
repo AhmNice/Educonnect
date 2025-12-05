@@ -46,7 +46,7 @@ export const useCourseStore = create((set, get) => ({
   // ============================================================
   // GET ALL COURSES
   // ============================================================
-  getAllCourses: async (force = false) => {
+  getAllCourses: async (force = false)     => {
     const { courses } = get()
     if (courses.length > 0 && !force) return
     set({ loadingCourses: true, courseError: null, courseSuccess: null });

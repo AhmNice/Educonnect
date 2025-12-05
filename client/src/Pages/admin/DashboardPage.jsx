@@ -21,57 +21,32 @@ import StatCard from "../../components/cards/StatCard";
 import { useAuthStore } from "../../store/authStore";
 import { useStatsStore } from "../../store/statsStore";
 import { useNavigate } from "react-router-dom";
+import ActivityLogList from "../../components/ActivityList";
+import { useActivityStore } from "../../store/logStore";
 const Admin_DashboardPage = () => {
   const { user } = useAuthStore();
   const { platformMetrics, fetch_platform_metrics } = useStatsStore();
+  const { fetchLog, recentActivity } = useActivityStore()
   const navigate = useNavigate();
   // Mock data
 
   useEffect(() => {
     const fetch_metric = async () => {
       await fetch_platform_metrics();
+      await fetchLog()
     };
     fetch_metric();
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     document.title = "Dashboard - EduConnect Admin";
-  },[])
+  }, []);
   const userDistribution = {
     students: 11200,
     tutors: 1343,
     admins: 12,
   };
-  const recentActivity = [
-    {
-      id: 1,
-      type: "user",
-      action: "New student registered",
-      time: "5 min ago",
-      user: "Sarah Chen",
-    },
-    {
-      id: 2,
-      type: "group",
-      action: "New study group created",
-      time: "12 min ago",
-      user: "CS-201 Group",
-    },
-    {
-      id: 3,
-      type: "resource",
-      action: "Resource uploaded",
-      time: "25 min ago",
-      user: "Dr. Smith",
-    },
-    {
-      id: 4,
-      type: "report",
-      action: "New report submitted",
-      time: "1 hour ago",
-      user: "Anonymous",
-    },
-  ];
+
 
   const pendingReports = [
     {
@@ -272,24 +247,7 @@ const Admin_DashboardPage = () => {
                   Recent Activity
                 </h3>
                 <div className="space-y-4">
-                  {recentActivity.map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="flex items-start space-x-3"
-                    >
-                      <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Shield className="w-4 h-4 text-gray-600" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm text-gray-900">
-                          {activity.action}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          {activity.user} • {activity.time}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                  <ActivityLogList activities={recentActivity}/>
                 </div>
               </div>
 

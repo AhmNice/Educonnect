@@ -20,3 +20,9 @@ export const pool = new Pool({
   password: `${process.env.DB_PASSWORD}`,
   port: Number(process.env.DB_PORT) || 5432,
 });
+export const host_pool = new Pool({
+  connectionString: "postgresql://educonnect:KRRyvVQk6FO4S6UYUIIxLtnPQGXGOJUm@dpg-d4o22g75r7bs73cdiorg-a.oregon-postgres.render.com/educonnect_2h47",
+  ssl: {
+    rejectUnauthorized: false
+  }
+});

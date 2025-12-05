@@ -23,13 +23,15 @@ import {
 import api from "../../lib/axios";
 import { toast } from "react-toastify";
 import PageLayout from "../../layout/PageLayout";
+import { useActivityStore } from "../../store/logStore";
+import ActivityLogList from "../../components/ActivityList";
 
 const UserProfilePage = () => {
   const { user_id } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
+  const { fetch_user_log, userActivity } = useActivityStore();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -47,6 +49,7 @@ const UserProfilePage = () => {
       } finally {
         setIsLoading(false);
       }
+      await fetch_user_log(user_id);
     };
 
     if (user_id) {
@@ -166,7 +169,7 @@ const UserProfilePage = () => {
                   )}
                   <div className="flex items-center text-gray-600">
                     <Calendar className="w-4 h-4 mr-3" />
-                    <span>Joined {formatDate(user.created_at)}</span>
+                    <span>Joined {formatDate(user?.created_at)}</span>
                   </div>
                 </div>
               </div>
@@ -182,10 +185,10 @@ const UserProfilePage = () => {
                       <Building className="w-5 h-5 text-gray-400 mt-0.5 mr-3" />
                       <div>
                         <p className="font-medium text-gray-900">
-                          {user.university_name}
+                          {user?.university_name}
                         </p>
                         <p className="text-sm text-gray-600">
-                          {user.university_year || "Current Student"}
+                          {user?.university_year || "Current Student"}
                         </p>
                       </div>
                     </div>
@@ -194,10 +197,10 @@ const UserProfilePage = () => {
                         <GraduationCap className="w-5 h-5 text-gray-400 mt-0.5 mr-3" />
                         <div>
                           <p className="font-medium text-gray-900">
-                            {user.department}
+                            {user?.department}
                           </p>
                           <p className="text-sm text-gray-600">
-                            {user.degree || "Bachelor's Degree"}
+                            {user?.degree || "Bachelor's Degree"}
                           </p>
                         </div>
                       </div>
@@ -205,27 +208,6 @@ const UserProfilePage = () => {
                   </div>
                 </div>
               )}
-
-              {/* Stats */}
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Statistics
-                </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900">
-                      {user.courses_count || 0}
-                    </div>
-                    <div className="text-sm text-gray-600">Courses</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-gray-900">
-                      {user.points || 0}
-                    </div>
-                    <div className="text-sm text-gray-600">Points</div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Right Column - Detailed Info */}
@@ -236,40 +218,23 @@ const UserProfilePage = () => {
                   About
                 </h3>
                 <p className="text-gray-600">
-                  {user.bio || "No bio provided."}
+                  {user?.bio || "No bio provided."}
                 </p>
               </div>
 
               {/* Skills */}
-              {user.skills && user.skills.length > 0 && (
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Skills
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {user.skills.map((skill, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+
 
               {/* Recent Activity */}
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Recent Activity
-                </h3>
-                <div className="space-y-4">
-                  {/* Add activity items here */}
-                  <div className="text-gray-500 text-center py-4">
-                    No recent activity to display.
-                  </div>
-                </div>
+              <div className="bg-white p-4 rounded-lg shadow-md">
+                <ActivityLogList
+                  viewType="compact"
+                  onRefresh={async () => {
+                    await fetch_user_log(user_id);
+                  }}
+                  location={`/admin/users/log/${user_id}`}
+                  activities={userActivity}
+                />
               </div>
             </div>
           </div>

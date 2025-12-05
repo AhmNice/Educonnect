@@ -40,6 +40,8 @@ import CoursesPage from "./Pages/admin/CoursesPage";
 import StudyGroupsPage from "./Pages/admin/StudyGroupPage";
 import ResourcesPage from "./Pages/admin/ResoursesPage";
 import UnderConstruction from "./components/UnderConstruction";
+import UserActivityLogPage from "./Pages/admin/LogPage";
+import UserLogPage from "./Pages/admin/UserLogPage";
 
 function App() {
   const router = createBrowserRouter(
@@ -209,6 +211,22 @@ function App() {
           element={
             <ProtectedRoute requiredRole="admin">
               <UserProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/logs"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <UserActivityLogPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="admin/users/log/:user_id"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <UserLogPage />
             </ProtectedRoute>
           }
         />

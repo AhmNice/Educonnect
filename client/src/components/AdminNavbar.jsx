@@ -30,7 +30,7 @@ const AdminNavbar = ({ collapse, isMobile, onClose, user }) => {
     { name: "Study Groups", icon: Users, path: "/admin/groups" },
     { name: "Resources", icon: Folder, path: "/admin/resources" },
     { name: "Reports", icon: AlertTriangle, path: "/admin/reports" },
-    { name: "Analytics", icon: BarChart2, path: "/admin/analytics" },
+    { name: "Logs", icon: BarChart2, path: "/admin/logs" },
     { name: "Settings", icon: Settings, path: "/settings" },
   ];
 

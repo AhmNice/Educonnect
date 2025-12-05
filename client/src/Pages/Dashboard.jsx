@@ -21,99 +21,52 @@ import StatCard from "../components/cards/StatCard";
 import { useAuthStore } from "../store/authStore";
 import { useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import api from "../lib/axios";
+import { useActivityStore } from "../store/logStore";
 const Dashboard = () => {
   // Mock user data
   const { user } = useAuthStore();
-
+  const [topGroup, setTopGroup] = useState([]);
+  const { fetch_my_log, myActivity } = useActivityStore();
   // Mock data
 
-  const studyGroups = [
-    {
-      group_id: "1",
-      group_name: "CS-201 Study Group",
-      course: "Data Structures",
-      description: "Weekly study sessions for Data Structures midterm preparation and algorithm practice.",
-      current_members: 8,
-      max_members: 15,
-      meeting_schedule: "Every Monday, 3:00 PM",
-      status: "active",
-      visibility: "public",
-      tags: ["algorithms", "programming", "java"],
-      created_at: "2024-01-15",
-      creator: {
-        full_name: "John Doe",
-        user_id:"31439b73-61bf-432e-9fec-d53d29a3c148",
-        university: "Stanford University"
-      },
-      member_count: 8
-    },
-    {
-      group_id: "2",
-      group_name: "Math Study Buddies",
-      course: "Calculus I",
-      description: "Collaborative problem solving and concept review for Calculus I.",
-      current_members: 5,
-      max_members: 10,
-      meeting_schedule: "Friday, 2:00 PM",
-      status: "active",
-      visibility: "public",
-      tags: ["mathematics", "calculus", "problem-solving"],
-      created_at: "2024-01-10",
-      creator: {
-        full_name: "Sarah Wilson",
-        user_id:"31439b73-61bf-432e-9fec-d53d79a3c148",
-        university: "MIT"
-      },
-      member_count: 5
-    },
-    {
-      group_id: "3",
-      group_name: "Physics Lab Partners",
-      course: "Physics Lab",
-      description: "Lab report collaboration and experiment discussion for Physics Laboratory.",
-      current_members: 3,
-      max_members: 6,
-      meeting_schedule: "Wednesday, 4:30 PM",
-      status: "active",
-      visibility: "public",
-      tags: ["physics", "lab", "experiments"],
-      created_at: "2024-01-20",
-      creator: {
-        full_name: "Mike Chen",
-        user_id:"31439b73-61bf-432e-9fec-d54d09a3c148",
-        university: "Harvard University"
-      },
-      member_count: 3
-    },
+  useEffect(() => {
+    const fetchTopGroups = async () => {
+      try {
+        const { data } = await api.get("/group/get-top-groups");
+        if (data.success) {
+          setTopGroup(data.groups);
+        }
+      } catch (error) {
+        console.error("Error fetching top groups:", error);
+      }
+    };
+    fetchTopGroups();
+  }, []);
+  useEffect(() => {
+    const fetchLog = async () => {
+      await fetch_my_log();
+    };
+    fetchLog();
+  }, []);
 
-  ];
-
-  const recentActivity = [
-    {
-      id: 1,
-      type: "message",
-      content: "New message in CS-201 Study Group",
-      time: "10 min ago",
-    },
-    {
-      id: 2,
-      type: "resource",
-      content: "Sarah shared lecture notes",
-      time: "1 hour ago",
-    },
-    {
-      id: 3,
-      type: "notification",
-      content: "Assignment due tomorrow",
-      time: "2 hours ago",
-    },
-    { id: 4, type: "login", content: "You logged in", time: "2 hours ago" },
-  ];
   const navigate = useNavigate();
   const metrics = {
     coursesEnrolled: 3,
-    studyGroups: 2,
+    topGroup: 2,
     unreadMessages: 5,
+  };
+  const formatFullDate = (timestamp) => {
+    if (!timestamp) return "N/A";
+    return new Date(timestamp).toLocaleString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
   };
   // Activity Item Component
   const ActivityItem = ({ activity }) => {
@@ -135,11 +88,13 @@ const Dashboard = () => {
     return (
       <div className="flex items-start space-x-3 py-3 border-b border-gray-100 last:border-0">
         <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
-          {getIcon(activity.type)}
+          {getIcon(activity.activity_type)}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-gray-800">{activity.content}</p>
-          <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+          <p className="text-sm text-gray-800">{activity.description}</p>
+          <p className="text-xs text-gray-500 mt-1">
+            {formatFullDate(activity.timestamp)}
+          </p>
         </div>
       </div>
     );
@@ -161,8 +116,7 @@ const Dashboard = () => {
                   !
                 </h1>
                 <p className="text-gray-600 mt-2">
-                Student at{" "}
-                  {user?.university?.name} • {user?.department}
+                  Student at {user?.university?.name} • {user?.department}
                 </p>
                 <p className="text-sm text-gray-500 mt-1">
                   Last login: {user?.lastLogin}
@@ -196,7 +150,7 @@ const Dashboard = () => {
             <StatCard
               icon={Users}
               title="Study Groups"
-              value={metrics.studyGroups}
+              value={metrics.topGroup}
               color="bg-green-500"
             />
             <StatCard
@@ -217,10 +171,9 @@ const Dashboard = () => {
                   <h2 className="text-xl font-bold text-gray-900">
                     Top 3 Study Groups
                   </h2>
-
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {studyGroups.map((group) => (
+                  {topGroup.map((group) => (
                     <StudyGroupCard key={group.id} group={group} />
                   ))}
                 </div>
@@ -231,24 +184,19 @@ const Dashboard = () => {
                   Quick Actions
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
-                  <button className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 text-center group">
+                  <button
+                  onClick={()=>navigate('/messages')}
+                  className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 text-center group">
                     <MessageSquare className="w-8 h-8 text-blue-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
                     <span className="font-medium text-gray-900">Messages</span>
                   </button>
-                  <button className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 text-center group">
-                    <Bell className="w-8 h-8 text-orange-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                    <span className="font-medium text-gray-900">
-                      Notifications
-                    </span>
-                  </button>
-                  <button className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 text-center group">
+                  <button
+                  onClick={()=> navigate('/resources')}
+                  className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 text-center group">
                     <Download className="w-8 h-8 text-green-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
                     <span className="font-medium text-gray-900">Resources</span>
                   </button>
-                  <button className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1 text-center group">
-                    <Share2 className="w-8 h-8 text-purple-500 mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                    <span className="font-medium text-gray-900">Share</span>
-                  </button>
+
                 </div>
               </section>
             </div>
@@ -261,60 +209,18 @@ const Dashboard = () => {
                   <h2 className="text-xl font-bold text-gray-900">
                     Recent Activity
                   </h2>
-                  <button className="text-indigo-600 hover:text-indigo-700 font-medium text-sm transition-colors">
-                    View All
-                  </button>
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4">
-                  {recentActivity.map((activity) => (
-                    <ActivityItem key={activity.id} activity={activity} />
+                  {myActivity.slice(0, 4).map((activity) => (
+                    <ActivityItem
+                      key={activity.activity_id}
+                      activity={activity}
+                    />
                   ))}
                 </div>
               </section>
 
-              {/* Analytics Summary */}
-              <section>
-                <h2 className="text-xl font-bold text-gray-900 mb-6">
-                  Study Analytics
-                </h2>
-                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <TrendingUp className="w-5 h-5 text-green-500" />
-                      <span className="font-semibold text-gray-900">
-                        Weekly Progress
-                      </span>
-                    </div>
-                    <Award className="w-5 h-5 text-yellow-500" />
-                  </div>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between text-sm text-gray-600 mb-1">
-                        <span>Study Hours</span>
-                        <span>12h</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-green-500 h-2 rounded-full"
-                          style={{ width: "70%" }}
-                        ></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm text-gray-600 mb-1">
-                        <span>Group Participation</span>
-                        <span>85%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-blue-500 h-2 rounded-full"
-                          style={{ width: "85%" }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </section>
+
             </div>
           </div>
         </div>

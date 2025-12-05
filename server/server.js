@@ -14,6 +14,7 @@ import { initSocketServer } from './src/config/socket.io_config.js'
 import conversationRoute from './src/routes/conversation.route.js'
 import requestRoute from './src/routes/request.route.js'
 import statsRoute from './src/routes/stats.route.js'
+import logRoute from './src/routes/activityLog.route.js'
 dotenv.config()
 const app = express()
 const server = http.createServer(app);
@@ -39,6 +40,7 @@ app.use('/auth/resource', resourceRoute)
 app.use('/auth/conversation', conversationRoute)
 app.use('/auth/request', requestRoute)
 app.use("/auth/stats", statsRoute)
+app.use("/auth/log", logRoute)
 const start_server = async () => {
   console.log("🔃 starting server ....");
   try {

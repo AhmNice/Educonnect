@@ -6,6 +6,7 @@ import { University } from "../model/University.js";
 import { sendOTPEmail, sendPasswordResetLink, sendPasswordResetSuccessEmail } from "../mail/emailServices.js";
 import { generateOTP } from "../util/generateToken.js";
 import { pool } from "../config/db.config.js";
+import { logUserActivity } from "../util/userLogs.js";
 // =============
 // Create new user
 // =============
@@ -44,6 +45,12 @@ export const createAccount = async (req, res) => {
 
     }
     await sendOTPEmail(user)
+    await logUserActivity(
+      user_data.user_id,
+      "account_creation",
+      "New account registered successfully"
+    );
+
     return res.status(201).json({
       success: true,
       message: "User created successfully",
@@ -90,6 +97,11 @@ export const login = async (req, res) => {
     // console.log(result)
     // create session cookie
     await createSession(res, session_user);
+    await logUserActivity(
+      userRecord.user_data.user_id,
+      "login",
+      "User logged in successfully"
+    );
 
     return res.status(200).json({
       success: true,
@@ -137,6 +149,11 @@ export const forgetPassword = async (req, res) => {
 
     // 4. Send email
     await sendPasswordResetLink({ full_name: userRecord.user_data.full_name, resetLink, email: email })
+    await logUserActivity(
+      userRecord.user_data.user_id,
+      "password_reset_request",
+      "User requested a password reset link"
+    );
 
     // 5. Respond success
     return res.status(200).json({
@@ -208,6 +225,12 @@ export const changePassword_with_token = async (req, res) => {
       full_name: found.user_data.full_name
     }
     await sendPasswordResetSuccessEmail(user)
+    await logUserActivity(
+      user_data.user_id,
+      "password_reset",
+      "User successfully changed password using reset token"
+    );
+
     return res.status(200).json({
       success: true,
       message: "Password updated successfully",
@@ -236,6 +259,12 @@ export const verifyOTP = async (req, res) => {
         message: result.message
       })
     }
+    await logUserActivity(
+      result.user_data.user_id,
+      "otp_verification",
+      "User verified account using OTP"
+    );
+
     return res.status(200).json({
       success: true,
       message: result.success,
@@ -287,6 +316,12 @@ export const resendOTP = async (req, res) => {
 
     // Send OTP email
     await sendOTPEmail(option);
+    await logUserActivity(
+      user.user_data.user_id,
+      "otp_resend",
+      "A new OTP was sent to the user"
+    );
+
 
     return res.status(200).json({
       success: true,
@@ -340,6 +375,12 @@ export const requestAccountVerification = async (req, res) => {
     };
 
     await sendOTPEmail(option);
+    await logUserActivity(
+      user.user_data.user_id,
+      "verification_request",
+      "User requested account verification OTP"
+    );
+
 
     return res.status(200).json({
       success: true,
@@ -414,6 +455,12 @@ export const updateUser = async (req, res) => {
         message: "User not found",
       });
     }
+    await logUserActivity(
+      user_id,
+      "update_profile",
+      "User profile updated"
+    );
+
     return res.status(200).json({
       success: true,
       message: "User updated successfully",
@@ -485,6 +532,13 @@ export const toggleUserStatus = async (req, res) => {
 
       if (updatedUser?.user_data) {
         updatedUsers.push(updatedUser.user_data);
+
+        // 🔥 Log activity for EACH updated user
+        await logUserActivity(
+          user_id,
+          "status_update",
+          `User status changed to '${status}'`
+        );
       }
     }
 
@@ -509,6 +563,7 @@ export const toggleUserStatus = async (req, res) => {
     });
   }
 };
+
 
 // ========================
 // send authenticated  user
@@ -563,6 +618,13 @@ export const logOut = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     });
+    if (req.user?.user_id) {
+      await logUserActivity(
+        req.user.user_id,
+        "logout",
+        "User logged out"
+      );
+    }
 
     return res.status(200).json({
       success: true,
@@ -613,6 +675,12 @@ export const createUserByAdmin = async (req, res) => {
       role
     });
     await newUser.save_user();
+    await logUserActivity(
+      newUser.user_data.user_id,
+      "admin_user_creation",
+      "Admin created a new user account"
+    );
+
     return res.status(201).json({
       success: true,
       message: "User created successfully",

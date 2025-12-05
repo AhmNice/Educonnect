@@ -3,6 +3,7 @@ import { createGroup, deleteGroup, generateInvitationLink, getAllGroups, getGrou
 import { verifySession } from "../util/session.js";
 import { verifyRole } from "../util/verifyRole.js";
 import { body, param, query } from "express-validator";
+import { suggestGroups } from "../util/topGroups.js";
 const groupRoute = express.Router();
 groupRoute.post("/create-group",
   [
@@ -57,5 +58,5 @@ groupRoute.delete("/delete-group/:group_id", verifySession, verifyRole(['admin',
   param('group_id').notEmpty().withMessage('Group ID is required')
 ], deleteGroup)
 
-
+groupRoute.get("/get-top-groups", verifySession, verifyRole(['student']), suggestGroups)
 export default groupRoute
