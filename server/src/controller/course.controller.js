@@ -1,17 +1,14 @@
 import { Course } from "../model/Course.js";
 import { handleInputError } from "../util/handleInputValidation.js";
 import { pool } from "../config/db.config.js";
+import { logUserActivity } from "../util/userLogs.js";
 
 export const createCourse = async (req, res) => {
   const { course_code, course_title, department, semester, user_id } = req.body;
 
-  // Validate inputs
   await handleInputError(req, res);
 
   try {
-    // =====================================
-    // Check if course_code already exists
-    // =====================================
     const exists = await pool.query(
       "SELECT * FROM learning.courses WHERE course_code = $1",
       [course_code]
@@ -24,18 +21,22 @@ export const createCourse = async (req, res) => {
       });
     }
 
-    // =====================================
-    // Create new course
-    // =====================================
     const newCourse = new Course({
       course_code,
       course_title,
       department,
       semester,
-      created_by: user_id
+      created_by: user_id,
     });
 
     const saved_course = await newCourse.save();
+
+    // 🔥 Log activity
+    await logUserActivity(
+      user_id,
+      "course_create",
+      `Created course: ${course_code} - ${course_title}`
+    );
 
     return res.status(201).json({
       success: true,
@@ -51,6 +52,7 @@ export const createCourse = async (req, res) => {
     });
   }
 };
+
 export const getAllCourses = async (req, res) => {
   try {
     const courses = await Course.getAll();
@@ -71,7 +73,6 @@ export const getAllCourses = async (req, res) => {
 };
 export const updateCourse = async (req, res) => {
   const { course_id } = req.params;
-  console.log(course_id)
   const updates = req.body;
 
   await handleInputError(req, res);
@@ -85,6 +86,16 @@ export const updateCourse = async (req, res) => {
         message: "Course not found",
       });
     }
+
+    // Extract user performing the update
+    const actor_id = req.user?.user_id || updates.updated_by;
+
+    // 🔥 Log activity
+    await logUserActivity(
+      actor_id,
+      "course_update",
+      `Updated course ID: ${course_id}`
+    );
 
     return res.status(200).json({
       success: true,
@@ -100,6 +111,7 @@ export const updateCourse = async (req, res) => {
     });
   }
 };
+
 export const deleteCourse = async (req, res) => {
   const { course_id } = req.params;
 
@@ -112,6 +124,15 @@ export const deleteCourse = async (req, res) => {
         message: "Course not found",
       });
     }
+
+    const actor_id = req.user?.user_id;
+
+    // 🔥 Log activity
+    await logUserActivity(
+      actor_id,
+      "course_delete",
+      `Deleted course ID: ${course_id}`
+    );
 
     return res.status(200).json({
       success: true,
