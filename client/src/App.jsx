@@ -42,6 +42,7 @@ import ResourcesPage from "./Pages/admin/ResoursesPage";
 import UnderConstruction from "./components/UnderConstruction";
 import UserActivityLogPage from "./Pages/admin/LogPage";
 import UserLogPage from "./Pages/admin/UserLogPage";
+import ReportsListPage from "./Pages/admin/ReportPage";
 
 function App() {
   const router = createBrowserRouter(
@@ -258,7 +259,7 @@ function App() {
           path="admin/reports"
           element={
             <ProtectedRoute requiredRole="admin">
-              <UnderConstruction />
+              <ReportsListPage />
             </ProtectedRoute>
           }
         />
@@ -270,6 +271,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
 
         {/* Error Route */}
         <Route path="*" element={<NotFound />} />

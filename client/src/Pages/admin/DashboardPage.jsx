@@ -48,32 +48,7 @@ const Admin_DashboardPage = () => {
   };
 
 
-  const pendingReports = [
-    {
-      id: 1,
-      type: "inappropriate_content",
-      user: "user123",
-      description: "Inappropriate message in group chat",
-      severity: "medium",
-      date: "2 hours ago",
-    },
-    {
-      id: 2,
-      type: "spam",
-      user: "user456",
-      description: "Multiple spam messages",
-      severity: "low",
-      date: "5 hours ago",
-    },
-    {
-      id: 3,
-      type: "harassment",
-      user: "user789",
-      description: "User harassment complaint",
-      severity: "high",
-      date: "1 day ago",
-    },
-  ];
+
 
   // User Table Row Component
   const UserRow = ({ user, selected, onSelect }) => (
@@ -240,7 +215,7 @@ const Admin_DashboardPage = () => {
             </div>
 
             {/* Recent Activity & Pending Reports */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1  gap-8">
               {/* Recent Activity */}
               <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-md">
                 <h3 className="text-lg font-semibold text-gray-900 mb-6">
@@ -251,22 +226,7 @@ const Admin_DashboardPage = () => {
                 </div>
               </div>
 
-              {/* Pending Reports */}
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-md">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Pending Reports
-                  </h3>
-                  <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                    {pendingReports.length} pending
-                  </span>
-                </div>
-                <div className="space-y-4">
-                  {pendingReports.map((report) => (
-                    <ReportCard key={report.id} report={report} />
-                  ))}
-                </div>
-              </div>
+
             </div>
 
             <div className=" grid grid-cols-2 lg:grid-cols-2 gap-8 pt-4">
