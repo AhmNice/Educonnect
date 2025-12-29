@@ -147,18 +147,18 @@ const JoinGroupModal = ({ isOpen, onClose }) => {
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
           {/* Group Name */}
           <h3 className="text-2xl font-bold text-gray-900 mb-2">
-            {groupDetails.group_name}
+            {groupDetails?.group_name}
           </h3>
 
           {/* Course */}
           <div className="flex items-center gap-2 text-gray-600 mb-4">
             <BookOpen className="w-4 h-4" />
-            <span className="font-medium">{groupDetails.course}</span>
+            <span className="font-medium">{groupDetails?.course}</span>
           </div>
 
           {/* Description */}
           <p className="text-gray-600 mb-6 leading-relaxed">
-            {groupDetails.description}
+            {groupDetails?.description}
           </p>
 
           {/* Details Grid */}
@@ -168,7 +168,7 @@ const JoinGroupModal = ({ isOpen, onClose }) => {
               <Users className="w-4 h-4 text-gray-500" />
               <div>
                 <p className="text-sm font-medium text-gray-900">
-                  {groupDetails.member_count}/{groupDetails.max_members}
+                  {groupDetails?.member_count}/{groupDetails?.max_members}
                 </p>
                 <p className="text-xs text-gray-500">Members</p>
               </div>
@@ -179,7 +179,7 @@ const JoinGroupModal = ({ isOpen, onClose }) => {
               <Calendar className="w-4 h-4 text-gray-500" />
               <div>
                 <p className="text-sm font-medium text-gray-900">
-                  {groupDetails.meeting_schedule}
+                  {groupDetails?.meeting_schedule}
                 </p>
                 <p className="text-xs text-gray-500">Meets</p>
               </div>
@@ -187,14 +187,14 @@ const JoinGroupModal = ({ isOpen, onClose }) => {
 
             {/* Visibility */}
             <div className="flex items-center gap-2">
-              {groupDetails.visibility === "public" ? (
+              {groupDetails?.visibility === "public" ? (
                 <Globe className="w-4 h-4 text-green-500" />
               ) : (
                 <Lock className="w-4 h-4 text-amber-500" />
               )}
               <div>
                 <p className="text-sm font-medium text-gray-900 capitalize">
-                  {groupDetails.visibility}
+                  {groupDetails?.visibility}
                 </p>
                 <p className="text-xs text-gray-500">Visibility</p>
               </div>
@@ -207,7 +207,7 @@ const JoinGroupModal = ({ isOpen, onClose }) => {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-900">
-                  {groupDetails.creator.full_name}
+                  {groupDetails?.creator.full_name}
                 </p>
                 <p className="text-xs text-gray-500">Creator</p>
               </div>
@@ -215,11 +215,11 @@ const JoinGroupModal = ({ isOpen, onClose }) => {
           </div>
 
           {/* Tags */}
-          {groupDetails.tags && groupDetails.tags.length > 0 && (
+          {groupDetails?.tags && groupDetails?.tags.length > 0 && (
             <div className="mb-6">
               <h4 className="text-sm font-medium text-gray-900 mb-2">Tags</h4>
               <div className="flex flex-wrap gap-2">
-                {groupDetails.tags.map((tag, index) => (
+                {groupDetails?.tags.map((tag, index) => (
                   <span
                     key={index}
                     className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full font-medium"
@@ -237,8 +237,8 @@ const JoinGroupModal = ({ isOpen, onClose }) => {
               <div>
                 <p className="font-medium text-blue-900">Available Spots</p>
                 <p className="text-sm text-blue-700">
-                  {groupDetails.max_members - groupDetails.member_count} out
-                  of {groupDetails.max_members} spots remaining
+                  {groupDetails?.max_members - groupDetails?.member_count} out
+                  of {groupDetails?.max_members} spots remaining
                 </p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">

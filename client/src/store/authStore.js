@@ -207,7 +207,9 @@ export const useAuthStore = create((set, get) => ({
   logoutUser: async (manual = true) => {
     try {
       await api.post("/users/logout");
-    } catch (e) { }
+    } catch (e) {
+      return
+     }
 
     set({
       ...initialState,
